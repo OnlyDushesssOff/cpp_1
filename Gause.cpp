@@ -17,11 +17,21 @@ void Show(double** matrix, int size, int vector, int highe, int weght){
             }
         }
         if(i == highe && vector == weght){
-            std::cout << "|" << std::setw(10) <<">>"<< matrix[i][vector] << std::endl; 
+            std::cout << "|" <<">>>"<<std::setw(7)<< matrix[i][vector] << std::endl; 
         }
         else{
             std::cout << "|" << std::setw(10) << matrix[i][vector] << std::endl;             
         }
+    }
+}
+//функция вывода расширенной матрицы
+void Show(double** matrix, int size, int vector){
+
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            std::cout<< std::setw(10)<<matrix[i][j]<< " ";           
+        }
+        std::cout << "|" << std::setw(11) << matrix[i][vector] << std::endl;  
     }
 }
 //функция вывода результатов вычисления
@@ -47,76 +57,59 @@ void Result(double** matrix, int size, int vector, int number, int values){
     }
     std::cout << std::endl;
 }
-//функция заполнения матрицы путем генерации псевдослучайных чисел
+//функция заполнения матрицы путем ручного ввода
 double** Person_generation(double** matrix, int size, int vector){
-    char aboba = 0;
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size +1; j++){
+            matrix[i][j] = 0;
+        }
+    }
     double znach = 0;
+    char aboba = 0;
     int hight1 = 0;
     int hight2 = hight1;
     int weght1 = 0;
     int weght2 = weght1;
-    while(aboba != 1){
-        Show(matrix, size, vector, hight2, weght2);
-        std::cout << "select the cell whose value you will change:"<<std::endl<<" D - Right, A - Left, S - Down, W - Up, R - save and activate, P - exit from programm"<<std::endl;
+    Show(matrix, size, vector, hight2, weght2);
+    bool flag = false;
+    while(flag != true){ 
+        std::cout << "select the cell whose value you will change:"<<std::endl<<" D - Right, A - Left, S - Down, W - Up, E - change value, R - save and activate, P - exit from programm"<<std::endl;
         std::cin >> aboba;
-        if(aboba == 68 || aboba == 100 || aboba ==65 || aboba ==97 || aboba ==115 ||aboba == 83 || aboba == 87|| aboba ==119 || aboba ==82 || aboba ==114 ||aboba == 80 || aboba == 112){
+        if(aboba == 101 || aboba == 69 || aboba == 100 || aboba == 68 || aboba ==97 || aboba ==65 || aboba ==115 ||aboba == 83 || aboba == 119|| aboba ==87 || aboba ==114 || aboba ==82 ||aboba == 80 || aboba == 112){
             switch(aboba){
-                case 68: weght2 += 1;break;
-                case 100: weght2 += 1;break;
-                case 65: weght2 -= 1;break;
-                case 97: weght2 -= 1;break;
-                case 115: hight2 -= 1;break;
-                case 83: hight2 -= 1;break;
-                case 87: hight2 += 1;break;
-                case 119: hight2 += 1;break;
-                case 82: aboba = 1;break;
-                case 114: aboba = 1;break;
-                case 80: exit(1);break;
-                case 112: exit(1);break;
-            } 
-            Show(matrix, size, vector, hight2, weght2);  
+            case 100: case 68: weght2 += 1;break;
+            case 97: case 65: weght2 -= 1;break;
+            case 115: case 83: hight2 += 1;break;
+            case 119: case 87: hight2 -= 1;break;
+            case 114: case 82: flag = true;break;
+            case 112: case 80: exit(1);break;
+            }
+            if(hight2 < 0 || hight2 >= size || weght2 < 0 || weght2 >= size+1){
+                std::cout<< "input error: you are out of matrix"<<std::endl;
+                hight2 = hight1;
+                weght2 = weght1;
+                Show(matrix, size, vector, hight1, weght1);
+            }
+            else{
+                hight1 = hight2;
+                weght1 = weght2;
+                if(aboba == 101|| aboba ==69){    
+                    int znach = 0;
+                    std::cout << "Enter new value" << std::endl;
+                    std::cin >> znach;
+                    matrix[hight1][weght1] = znach;
+                    Show(matrix, size, vector, hight2, weght2);  
+                }else if(aboba != 82 && aboba != 114){
+                    Show(matrix, size, vector, hight2, weght2);  
+                }    
+            }
         }else{
             std::cout<<"input error: you entered an invalid command"<<std::endl;
             Show(matrix, size, vector, hight1, weght1);
         }
-        if(aboba == 1){
-            return matrix;
-        }
-        if(aboba == 68 || aboba == 100 || aboba ==65 || aboba ==97 || aboba ==115 ||aboba == 83 || aboba == 87|| aboba ==119){
-            std::cout << "Do you want to change the value of the current cell or do you want to leave it the same?" << std::endl<<"Y - yes, N - no"<<std::endl;
-            std::cin >> aboba;
-            if(aboba == 121 || aboba == 89 || aboba ==78 || aboba == 110){
-                switch(aboba){
-                    case 121:{
-                        std::cout << "Enter new value" << std::endl;
-                        std::cin >> znach;
-                        break;
-                    }
-                    case 89:{
-                        std::cout << "Enter new value" << std::endl;
-                        std::cin >> znach;
-                        break;
-                    }
-                    case 78:break;
-                    case 110:break;
-                }
-            }
-            else{
-                std::cout<<"input error: you entered an invalid command"<<std::endl;
-                Show(matrix, size, vector, hight2, weght2);
-            }
-            if(hight2 < 0 || hight2 >= size || weght2 < 0 || weght2 >= size+1){
-                std::cout<< "input error: you are out of matrix"<<std::endl;
-                Show(matrix, size, vector, hight1, weght1);
-            }
-            else{
-                matrix[hight2][weght2] = znach;
-                hight1 = hight2;
-                weght1 = weght2;
-            }
         aboba = 0;
-        }
     }
+    return matrix; 
 }
 //функция заполнения матрицы путем генерации псевдослучайных чисел
 double** Computer_generation(double** matrix, int size, int vector, int number, int values){
@@ -184,7 +177,7 @@ double** Simplifed(double** matrix, int size, int vector, int number, int values
             }
         }
     }
-    Show(matrix, size, vector, 1000,1000);
+    Show(matrix, size, vector);
     matrix = behind_work(matrix, size, vector, number, values);
     return matrix;
 } 
@@ -215,7 +208,7 @@ double** Permutation(double** matrix, int size, int vector, int number, int valu
             }
         }
     }
-    Show(matrix, size, vector, 1000,1000);
+    Show(matrix, size, vector);
     matrix = behind_work(matrix, size, vector, number, values);
     return matrix;
 } 
