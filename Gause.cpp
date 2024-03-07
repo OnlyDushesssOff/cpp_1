@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <stdlib.h>
 
-//функция вывода расширенной матрицы
+//функция вывода расширенной матрицы при редактировании
 void Show(double** matrix, int size, int vector, int highe, int weght){
 
     for(int i = 0; i < size; i++){
@@ -26,7 +26,6 @@ void Show(double** matrix, int size, int vector, int highe, int weght){
 }
 //функция вывода расширенной матрицы
 void Show(double** matrix, int size, int vector){
-
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             std::cout<< std::setw(10)<<matrix[i][j]<< " ";           
@@ -34,9 +33,16 @@ void Show(double** matrix, int size, int vector){
         std::cout << "|" << std::setw(11) << matrix[i][vector] << std::endl;  
     }
 }
+//Функция вывода вектора неувязки
+void Show(double* pog, int size){
+    std::cout<<std::endl<< "Pogreshnost:" <<std::endl;
+    for(int i = 0; i < size; i++){
+        std::cout << std::setw(10)<<pog[i]<< " ";
+    }    
+}
 //функция вывода результатов вычисления
 void Result(double** matrix, int size, int vector, int number, int values){
-        int h = 0;
+    int h = 0;
     while(h != 11*(size+1)){
         std::cout << "-"; 
         h+=1;       
@@ -47,15 +53,43 @@ void Result(double** matrix, int size, int vector, int number, int values){
     }
     std::cout << std::endl;
     for(int i = 0; i < size; i++){
-        int ans = 0;
-        for(int h = 0; h < size; h++){
-            if(matrix[h][number] = i){
-                ans = h;
-            }
-        }
-        std::cout << std::setw(10)<<matrix[ans][values]<< " ";
+        std::cout << std::setw(10)<<matrix[i][values]<< " ";
     }
     std::cout << std::endl;
+}
+//Функция вычисления вектора неувязки
+double* Pogreshnost(double**matrix, double** matrix_copy, int size, int vector, int number, int values){
+    double* znach = new double[size];
+    for(int i = 0; i < size; i++){
+        for(int h = 0; h < size; h++){
+            if(matrix[h][number] == i){
+                znach[i] = matrix[h][values];    
+            }
+        }
+    }
+    double* pog = new double[size];
+    for(int i = 0; i < size; i++){
+        double aboba2 = 0;
+        for(int j = 0; j < size; j++){
+            aboba2 += matrix_copy[i][j] * znach[j];
+        }
+        pog[i] = matrix_copy[i][vector] - aboba2;
+    }
+    return pog;
+}
+//Функция создания и заполнения копии матрицы
+double** Matrix_copy(double** matrix, int size, int vector){
+    double** matrix_copy = new double*[size];
+    for(int i = 0; i < size; i++){
+        matrix_copy[i] = new double[size+1];
+    }
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            matrix_copy[i][j] = matrix[i][j];
+        }
+        matrix_copy[i][vector] = matrix[i][vector];
+    }
+    return matrix_copy;
 }
 //функция заполнения матрицы путем ручного ввода
 double** Person_generation(double** matrix, int size, int vector){
@@ -81,8 +115,11 @@ double** Person_generation(double** matrix, int size, int vector){
             case 97: case 65: weght2 -= 1;break;
             case 115: case 83: hight2 += 1;break;
             case 119: case 87: hight2 -= 1;break;
-            case 114: case 82: flag = true;break;
             case 112: case 80: exit(1);break;
+            case 114: case 82: 
+                flag = true;
+                std::cout<< std::endl<< "Decision:"<<std::endl;
+                break;
             }
             if(hight2 < 0 || hight2 >= size || weght2 < 0 || weght2 >= size+1){
                 std::cout<< "input error: you are out of matrix"<<std::endl;
@@ -106,6 +143,8 @@ double** Person_generation(double** matrix, int size, int vector){
         }else{
             std::cout<<"input error: you entered an invalid command"<<std::endl;
             Show(matrix, size, vector, hight1, weght1);
+            std::cin.clear();
+            fflush(stdin);
         }
         aboba = 0;
     }
@@ -119,9 +158,9 @@ double** Computer_generation(double** matrix, int size, int vector, int number, 
     std::uniform_int_distribution<std::mt19937::result_type> dist;
 
     for(int i = 0; i < size; i++){
-        matrix[i][vector] = dist(gen) % 10;
+        matrix[i][vector] = dist(gen) % 2000000;
         for(int j = 0; j < size; j++){
-            matrix[i][j] = dist(gen) % 10;
+            matrix[i][j] = dist(gen) % 2000000;
         }
     }
     Show(matrix, size, vector, 1000, 1000);
@@ -149,94 +188,50 @@ double** behind_work(double** matrix, int size, int vector, int number, int valu
             for(int j = 0; j<size; j++){
                 matrix[i][vector] -= matrix[j][values]*matrix[i][j];
             }
-        matrix[i][values] = matrix[i][vector]/matrix[i][i];
+            matrix[i][values] = matrix[i][vector]/matrix[i][i];
         }
     Result(matrix, size, vector, number, values);
     return matrix;
 }
-//функция первого режима работы - упрощенный
-double** Simplifed(double** matrix, int size, int vector, int number, int values){
+
+//функция прямого хода работы
+double** Forward_work(double** matrix, int size, int vector, int number, int values){
     for(int i = 0; i<size-1; i++){
         double R = matrix[i][i];
         if(R == 0){
-            std::cout << "The program has stopped. Reason for error: 0 on diagonal";
-            exit(0);
-        }
-        else{
-            matrix[i][vector] = matrix[i][vector]/R;
-            for(int j = i; j < size; j++){
-               matrix[i][j] = matrix[i][j]/R;
-            }
-            R = matrix[i+1][i]/matrix[i][i];
-            for(int j = i; j<size;j++){
-                matrix[i+1][j] = matrix[i+1][j] - matrix[i][j]*R;
-            }
-            matrix[i+1][vector] = matrix[i+1][vector] - matrix[i][vector]*R;
-            for(int j = 0; j<=i;j++){
-                matrix[i+1][j] = 0;
-            }
-        }
-    }
-    Show(matrix, size, vector);
-    matrix = behind_work(matrix, size, vector, number, values);
-    return matrix;
-} 
-//функция второго режима работы - перестановка
-double** Permutation(double** matrix, int size, int vector, int number, int values){
-        for(int i = 0; i<size-1; i++){
-        double R = matrix[i][i];
-        if(R == 0){
+            bool flag = true;
             for(int j = i; j < size; j++){
                 if(matrix[i][j] != 0){
                     matrix = Replace(matrix, size, i, j, number, values);
+                    flag = false;
+                    R = matrix[i][i];
                     break;
                 }
             }
-        }
-        else{
-            matrix[i][vector] = matrix[i][vector]/R;
-            for(int j = i; j < size; j++){
-               matrix[i][j] = matrix[i][j]/R;
+            if(flag == true){
+                std::cout << "Input error: 0 in line not blanked";
+                exit(0);
             }
-            R = matrix[i+1][i]/matrix[i][i];
+        }
+        matrix[i][vector] = matrix[i][vector]/R;
+        for(int j = i; j < size; j++){
+           matrix[i][j] = matrix[i][j]/R;
+        }
+        for(int h = i+1; h < size; h++){
+            R = matrix[h][i]/matrix[i][i];
             for(int j = i; j<size;j++){
-                matrix[i+1][j] = matrix[i+1][j] - matrix[i][j]*R;
+                matrix[h][j] = matrix[h][j] - matrix[i][j]*R;
             }
-            matrix[i+1][vector] = matrix[i+1][vector] - matrix[i][vector]*R;
-            for(int j = 0; j<=i;j++){
-                matrix[i+1][j] = 0;
-            }
+            matrix[h][vector] = matrix[h][vector] - matrix[i][vector]*R;
         }
-    }
+        for(int j = 0; j<=i;j++){
+            matrix[i+1][j] = 0;
+        }
+    }    
     Show(matrix, size, vector);
     matrix = behind_work(matrix, size, vector, number, values);
     return matrix;
 } 
-//функция третьего режима работы - поиск максимума
-double** Maximum(double** matrix, int size, int vector, int number, int values){
-    return NULL;
-    
-} 
-//функция прямого хода работы
-double** forward_work(double** matrix, int size, int vector, int number, int values){
-    int flag = 1;
-    std::cout << "Select operating mode; 1 - simplified, 2 - permutation, 3 - maximum." << std::endl;
-    std::cin >> flag;
-    if(flag == 1){//первый режим работы - упрощенный
-        matrix = Simplifed(matrix, size, vector, number, values);
-    } 
-    else if(flag == 2){//второй режим работы - перестановки
-        matrix = Permutation(matrix, size, vector, number, values);
-    }
-    else if(flag == 3){//третий режим работы - поиск максимума
-        matrix = Maximum(matrix, size, vector, number, values);
-    }
-    else{
-        std::cout << "Input Error"<<std::endl;
-        exit(0);
-    }
-    return matrix;
-}
 
 int main(){
 //задание размера матрицы
@@ -256,16 +251,30 @@ int main(){
         matrix[i][values] = 0;
         matrix[i][number] = i;
     }
-    std::cout << "select matrix generation mode: P - human, C - computer"<<std::endl;
+//режим работы
+    std::cout << "select matrix generation mode(P - human, C - computer): ";
     std::cin >> mod;
+    std::cout << std::endl;
     if(mod ==112 || mod == 80){
         matrix = Person_generation(matrix, size, vector);
     }else if(mod == 67 || mod == 99){
+        std::cout << "Matrix: "<<std::endl;
         matrix = Computer_generation(matrix, size, vector, number, values);
+        std::cout <<std::endl <<"Decision:"<<std::endl;
     }else{
         std::cout<<"input error: you entered an invalid command"<<std::endl;
         return 0;
     }
+//создание копии
+    double** matrix_copy = Matrix_copy(matrix, size, vector);
+//вычисления
+    matrix = Forward_work(matrix, size, vector, number, values);
+//вектор неувязки
+    double* pog = new double[size];
+    pog = Pogreshnost(matrix, matrix_copy, size, vector, number, values);
+    Show(pog, size);
+    std::cout <<std::endl <<std::endl<<"Complete!";
+}
     matrix = forward_work(matrix, size, vector, number, values);
     std::cout << "Complete!";
 }
