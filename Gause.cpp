@@ -6,7 +6,7 @@
 
 //функция вывода расширенной матрицы при редактировании
 void Show(double** matrix, int size, int vector, int highe, int weght){
-
+    std::cout << "Matrix: "<<std::endl;
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             if(i == highe && j == weght){
@@ -125,6 +125,7 @@ double** Person_generation(double** matrix, int size, int vector){
                 std::cout<< "input error: you are out of matrix"<<std::endl;
                 hight2 = hight1;
                 weght2 = weght1;
+                system("cls");
                 Show(matrix, size, vector, hight1, weght1);
             }
             else{
@@ -135,13 +136,16 @@ double** Person_generation(double** matrix, int size, int vector){
                     std::cout << "Enter new value" << std::endl;
                     std::cin >> znach;
                     matrix[hight1][weght1] = znach;
+                    system("cls");
                     Show(matrix, size, vector, hight2, weght2);  
                 }else if(aboba != 82 && aboba != 114){
+                    system("cls");
                     Show(matrix, size, vector, hight2, weght2);  
                 }    
             }
         }else{
             std::cout<<"input error: you entered an invalid command"<<std::endl;
+            system("cls");
             Show(matrix, size, vector, hight1, weght1);
             std::cin.clear();
             fflush(stdin);
@@ -256,6 +260,7 @@ int main(){
     std::cin >> mod;
     std::cout << std::endl;
     if(mod ==112 || mod == 80){
+        system("cls");
         matrix = Person_generation(matrix, size, vector);
     }else if(mod == 67 || mod == 99){
         std::cout << "Matrix: "<<std::endl;
