@@ -275,6 +275,3 @@ int main(){
     Show(pog, size);
     std::cout <<std::endl <<std::endl<<"Complete!";
 }
-    matrix = forward_work(matrix, size, vector, number, values);
-    std::cout << "Complete!";
-}
