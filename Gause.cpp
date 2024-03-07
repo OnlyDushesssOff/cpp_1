@@ -163,7 +163,7 @@ double** Computer_generation(double** matrix, int size, int vector, int number, 
             matrix[i][j] = dist(gen) % 100;
         }
     }
-    Show(matrix, size, vector, 1000, 1000);
+    Show(matrix, size, vector);
     return matrix;
 }
 //функция перестановки столбцов
