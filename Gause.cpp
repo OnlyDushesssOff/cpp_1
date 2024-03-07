@@ -158,9 +158,9 @@ double** Computer_generation(double** matrix, int size, int vector, int number, 
     std::uniform_int_distribution<std::mt19937::result_type> dist;
 
     for(int i = 0; i < size; i++){
-        matrix[i][vector] = dist(gen) % 2000000;
+        matrix[i][vector] = dist(gen) % 100;
         for(int j = 0; j < size; j++){
-            matrix[i][j] = dist(gen) % 2000000;
+            matrix[i][j] = dist(gen) % 100;
         }
     }
     Show(matrix, size, vector, 1000, 1000);
